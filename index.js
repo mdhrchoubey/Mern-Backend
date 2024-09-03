@@ -2,17 +2,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-
-
-mongoose.connect("mongodb://localhost:27017/FinalTouch", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error(err));
-
-
 const app = express();
+const http=require('http').Server(app)
+
+
+mongoose.connect("mongodb+srv://mdhrchoubey:DsqYfwIzNrLflpvj@mernproject.tgo20.mongodb.net/?retryWrites=true&w=majority&appName=MernProject");
+
+
+
 app.use(bodyParser.json());
 app.use(cors()
 );

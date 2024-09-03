@@ -107,33 +107,66 @@ const signup=async (req, res) => {
 
     ///////////////// Profile Update ////////////////////////////////////
 
-  const profileUpdate= async (req, res)  => {
-    try {
-      const { userName } = req.params;
-      const { name, email } = req.body;
-      
-      let updateData = { name, email };
-      
-      if (req.file) {
-        updateData.imageUrl = `/uploads/${req.file.filename}`;
+    const profileUpdate = async (req, res) => {
+      try {
+        const { userName } = req.params;
+        const { name, email } = req.body;
+    
+        let updateData = { name, email };
+    
+        if (req.file) {
+          const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'uploads',
+            public_id: `users/${userName}`,
+          });
+          updateData.imageUrl = uploadResult.secure_url;
+        }
+    
+        const updatedUser = await User.findOneAndUpdate(
+          { userName },
+          updateData,
+          { new: true }
+        );
+    
+        if (!updatedUser) {
+          return res.status(404).json({ message: 'User not found' });
+        }
+    
+        res.json(updatedUser);
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        res.status(500).json({ message: 'Error updating profile' });
       }
-  
-      const updatedUser = await User.findOneAndUpdate(
-        { userName },
-        updateData,
-        { new: true }
-      );
-  
-      if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-  
-      res.json(updatedUser);
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      res.status(500).json({ message: 'Error updating profile' });
     }
-  }
+
+
+  // const profileUpdate= async (req, res)  => {
+  //   try {
+  //     const { userName } = req.params;
+  //     const { name, email } = req.body;
+      
+  //     let updateData = { name, email };
+      
+  //     if (req.file) {
+  //       updateData.imageUrl = `/uploads/${req.file.filename}`;
+  //     }
+  
+  //     const updatedUser = await User.findOneAndUpdate(
+  //       { userName },
+  //       updateData,
+  //       { new: true }
+  //     );
+  
+  //     if (!updatedUser) {
+  //       return res.status(404).json({ message: 'User not found' });
+  //     }
+  
+  //     res.json(updatedUser);
+  //   } catch (error) {
+  //     console.error('Error updating profile:', error);
+  //     res.status(500).json({ message: 'Error updating profile' });
+  //   }
+  // }
 
   ///////////////// Forget Password////////////////////////////////////
 
